@@ -1,0 +1,17 @@
+﻿@using GoodHamburguer.Shared
+@inject NavigationManager Nav
+
+<div class="card shadow-sm h-100" style="width: 18rem; margin: 10px; border-radius: 15px; overflow: hidden;">
+    <div class="card-body">
+        <h5 class="card-title fw-bold">@Item.Nome</h5>
+        <p class="card-text text-muted">@Item.Descricao</p>
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <span class="badge bg-success fs-6">@Item.Preco.ToString("C")</span>
+            <button class="btn btn-outline-warning btn-sm" @onclick='() => Nav.NavigateTo("/pedidos")'>Fazer Pedido →</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public ProdutoResponse Item { get; set; } = null!;
+}

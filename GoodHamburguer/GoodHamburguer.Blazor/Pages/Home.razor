@@ -1,0 +1,33 @@
+﻿@page "/"
+@using GoodHamburguer.Shared
+@using GoodHamburguer.Blazor.Shared.Components
+@inject GoodHamburguer.Blazor.Services.CardapioService CardapioService
+
+<PageTitle>Good Hamburguer - Cardápio</PageTitle>
+
+<div class="container mt-4">
+    <h1 class="mb-4">🍔 Nosso Cardápio</h1>
+
+    <StateView Items="@produtos">
+        <div class="d-flex flex-wrap justify-content-start">
+            @foreach (var p in produtos!)
+            {
+                <ProdutoCard Item="@p" />
+            }
+        </div>
+    </StateView>
+</div>
+
+@code {
+    private IEnumerable<ProdutoResponse>? produtos;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await CardapioService.GetCardapioAsync();
+
+        if (result.Success)
+            produtos = result.Data;
+        else
+            produtos = new List<ProdutoResponse>();
+    }
+}

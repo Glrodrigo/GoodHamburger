@@ -1,0 +1,33 @@
+﻿@* StateView.razor *@
+@typeparam TItem
+
+@if (Items == null)
+{
+    <div class="d-flex justify-content-center my-5">
+        <div class="spinner-border text-warning" role="status">
+            <span class="visually-hidden">Carregando...</span>
+        </div>
+        <span class="ms-2">@LoadingText</span>
+    </div>
+}
+else if (!Items.Any())
+{
+    <div class="alert alert-info mt-4">
+        <h4 class="alert-heading">@EmptyIcon @EmptyTitle</h4>
+        <p>@EmptyMessage</p>
+    </div>
+}
+else
+{
+    @ChildContent
+}
+
+@code {
+    [Parameter] public IEnumerable<TItem>? Items { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    [Parameter] public string LoadingText { get; set; } = "Carregando...";
+    [Parameter] public string EmptyIcon { get; set; } = "🍔";
+    [Parameter] public string EmptyTitle { get; set; } = "Opa!";
+    [Parameter] public string EmptyMessage { get; set; } = "O cardápio está vazio no momento. Volte mais tarde!";
+}

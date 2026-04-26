@@ -1,0 +1,94 @@
+﻿@* GoodHamburguer.Blazor/Pages/PedidoDetalhe.razor *@
+
+@page "/pedidos/{Id:int}"
+@using GoodHamburguer.Shared
+@inject GoodHamburguer.Blazor.Services.PedidoService PedidoService
+@inject NavigationManager Nav
+
+<PageTitle>Pedido #@Id</PageTitle>
+
+<div class="container mt-4" style="max-width: 680px">
+    <button class="btn btn-outline-secondary mb-3" @onclick='() => Nav.NavigateTo("/pedidos")'>
+        ← Voltar
+    </button>
+
+    @if (pedido is null && !erro)
+    {
+        <div class="d-flex align-items-center">
+            <div class="spinner-border text-warning me-2" role="status"></div>
+            Carregando pedido...
+        </div>
+    }
+    else if (erro)
+    {
+        <div class="alert alert-danger">Pedido não encontrado.</div>
+    }
+    else
+    {
+        <div class="card shadow">
+            <div class="card-header bg-warning d-flex justify-content-between align-items-center">
+                <h4 class="mb-0 fw-bold">📋 Pedido #@pedido!.Id</h4>
+                <small>@pedido.DataPedido.ToString("dd/MM/yyyy HH:mm")</small>
+            </div>
+            <div class="card-body">
+
+                <h6 class="fw-bold mb-3">🛒 Itens do Pedido</h6>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th class="text-end">Preço</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in pedido.Itens)
+                        {
+                            <tr>
+                                <td>@item.NomeProduto</td>
+                                <td class="text-end">@item.PrecoUnitario.ToString("C")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <hr />
+
+                <div class="d-flex justify-content-between">
+                    <span>Subtotal</span>
+                    <span>@pedido.Subtotal.ToString("C")</span>
+                </div>
+
+                @if (pedido.DescontoPercentual > 0)
+                {
+                    <div class="d-flex justify-content-between text-success">
+                        <span>Desconto (@((pedido.DescontoPercentual * 100).ToString("0"))%)</span>
+                        <span>- @pedido.ValorDesconto.ToString("C")</span>
+                    </div>
+                }
+
+                <div class="d-flex justify-content-between fw-bold fs-5 mt-2">
+                    <span>Total</span>
+                    <span class="text-success">@pedido.TotalFinal.ToString("C")</span>
+                </div>
+
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private PedidoResponse? pedido;
+    private bool erro = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await PedidoService.GetPedidoByIdAsync(Id);
+
+        if (!result.Success || result.Data is null)
+            erro = true;
+        else
+            pedido = result.Data;
+    }
+}

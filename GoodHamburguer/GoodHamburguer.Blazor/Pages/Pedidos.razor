@@ -1,0 +1,340 @@
+﻿@* GoodHamburguer.Blazor/Pages/Pedidos.razor *@
+
+@page "/pedidos"
+@using GoodHamburguer.Shared
+@using GoodHamburguer.Blazor.Shared.Components
+@inject GoodHamburguer.Blazor.Services.PedidoService PedidoService
+@inject GoodHamburguer.Blazor.Services.CardapioService CardapioService
+@inject NavigationManager Nav
+
+<PageTitle>Good Hamburguer - Pedidos</PageTitle>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>📋 Pedidos</h1>
+        <button class="btn btn-warning fw-bold" @onclick="AbrirModalNovoPedido">
+            ➕ Novo Pedido
+        </button>
+    </div>
+
+    @if (!string.IsNullOrEmpty(mensagemErro))
+    {
+        <div class="alert alert-danger alert-dismissible">
+            @mensagemErro
+            <button type="button" class="btn-close" @onclick="() => mensagemErro = null"></button>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(mensagemSucesso))
+    {
+        <div class="alert alert-success alert-dismissible">
+            @mensagemSucesso
+            <button type="button" class="btn-close" @onclick="() => mensagemSucesso = null"></button>
+        </div>
+    }
+
+    <StateView Items="@pedidos"
+               LoadingText="Buscando pedidos..."
+               EmptyIcon="📋"
+               EmptyTitle="Nenhum pedido ainda!"
+               EmptyMessage="Clique em '➕ Novo Pedido' para fazer o primeiro pedido.">
+        <table class="table table-hover align-middle shadow-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Data</th>
+                    <th>Subtotal</th>
+                    <th>Desconto</th>
+                    <th>Total</th>
+                    <th class="text-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var pedido in pedidos!)
+                {
+                    <tr>
+                        <td><span class="badge bg-secondary">#@pedido.Id</span></td>
+                        <td>@pedido.DataPedido.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@pedido.Subtotal.ToString("C")</td>
+                        <td>
+                            @if (pedido.DescontoPercentual > 0)
+                            {
+                                <span class="badge bg-success">
+                                    -@((pedido.DescontoPercentual * 100).ToString("0"))%
+                                    (@pedido.ValorDesconto.ToString("C"))
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
+                        <td class="fw-bold text-success">@pedido.TotalFinal.ToString("C")</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-primary me-1"
+                                    @onclick="() => VerDetalhes(pedido.Id)">
+                                🔍
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning me-1"
+                                    @onclick="() => AbrirModalEditar(pedido)">
+                                ✏️
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger"
+                                    @onclick="() => ConfirmarExclusao(pedido)">
+                                🗑️
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </StateView>
+</div>
+
+@* Modal Novo/Editar Pedido *@
+@if (mostrarModal)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background:rgba(0,0,0,0.5)">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title fw-bold">
+                        @(pedidoEditando is null ? "➕ Novo Pedido" : $"✏️ Editar Pedido #{pedidoEditando.Id}")
+                    </h5>
+                    <button class="btn-close" @onclick="FecharModal"></button>
+                </div>
+                <div class="modal-body">
+
+                    @if (!string.IsNullOrEmpty(erroModal))
+                    {
+                        <div class="alert alert-danger">@erroModal</div>
+                    }
+
+                    <p class="text-muted mb-3">Selecione até um item de cada categoria:</p>
+
+                    @* Sanduíches *@
+                    <h6 class="fw-bold">🍔 Sanduíches</h6>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        @foreach (var p in cardapio.Where(p => p.Categoria == "Sanduiche"))
+                        {
+                            var selecionado = produtosSelecionados.Contains(p.Id);
+                            <button class="btn @(selecionado ? "btn-warning" : "btn-outline-secondary") btn-sm"
+                                    @onclick="() => ToggleProduto(p)">
+                                @p.Nome — @p.Preco.ToString("C")
+                                @if (selecionado)
+                                {
+                                    <span> ✓</span>
+                                }
+                            </button>
+                        }
+                    </div>
+
+                    @* Acompanhamentos *@
+                    <h6 class="fw-bold">🍟 Acompanhamentos</h6>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        @foreach (var p in cardapio.Where(p => p.Categoria == "Acompanhamento"))
+                        {
+                            var selecionado = produtosSelecionados.Contains(p.Id);
+                            <button class="btn @(selecionado ? "btn-warning" : "btn-outline-secondary") btn-sm"
+                                    @onclick="() => ToggleProduto(p)">
+                                @p.Nome — @p.Preco.ToString("C")
+                                @if (selecionado)
+                                {
+                                    <span> ✓</span>
+                                }
+                            </button>
+                        }
+                    </div>
+
+                    @* Resumo *@
+                    @if (produtosSelecionados.Count > 0)
+                    {
+                        <div class="alert alert-light border mt-3">
+                            <strong>Selecionados:</strong>
+                            @string.Join(", ", cardapio.Where(p => produtosSelecionados.Contains(p.Id)).Select(p => p.Nome))
+                        </div>
+                    }
+
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="FecharModal">Cancelar</button>
+                    <button class="btn btn-warning fw-bold" @onclick="SalvarPedido" disabled="@salvando">
+                        @(salvando ? "Salvando..." : "💾 Salvar")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@* Modal Confirmação Exclusão *@
+@if (pedidoParaExcluir is not null)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background:rgba(0,0,0,0.5)">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">🗑️ Confirmar Exclusão</h5>
+                </div>
+                <div class="modal-body">
+                    Tem certeza que deseja remover o <strong>Pedido #@pedidoParaExcluir.Id</strong>?
+                    <br />
+                    <small class="text-muted">Essa ação não pode ser desfeita.</small>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="() => pedidoParaExcluir = null">Cancelar</button>
+                    <button class="btn btn-danger fw-bold" @onclick="ExcluirPedido">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private IEnumerable<PedidoResponse>? pedidos;
+    private List<ProdutoResponse> cardapio = [];
+    private List<int> produtosSelecionados = [];
+
+    private PedidoResponse? pedidoEditando;
+    private PedidoResponse? pedidoParaExcluir;
+
+    private bool mostrarModal = false;
+    private bool salvando = false;
+
+    private string? mensagemErro;
+    private string? mensagemSucesso;
+    private string? erroModal;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CarregarDados();
+    }
+
+    private async Task CarregarDados()
+    {
+        var pedidosResult = await PedidoService.GetPedidosAsync();
+        pedidos = pedidosResult.Success ? pedidosResult.Data : [];
+
+        var cardapioResult = await CardapioService.GetCardapioAsync();
+        cardapio = cardapioResult.Success ? cardapioResult.Data?.ToList() ?? [] : [];
+    }
+
+    private void AbrirModalNovoPedido()
+    {
+        pedidoEditando = null;
+        produtosSelecionados = [];
+        erroModal = null;
+        mostrarModal = true;
+    }
+
+    private void AbrirModalEditar(PedidoResponse pedido)
+    {
+        var pedidoAtualizado = pedidos?.FirstOrDefault(p => p.Id == pedido.Id) ?? pedido;
+
+        pedidoEditando = pedidoAtualizado;
+        produtosSelecionados = pedidoAtualizado.Itens.Select(i => i.ProdutoId).ToList();
+        erroModal = null;
+        mostrarModal = true;
+    }
+
+    private void FecharModal()
+    {
+        mostrarModal = false;
+        pedidoEditando = null;
+        produtosSelecionados = [];
+        erroModal = null;
+    }
+
+    private void ToggleProduto(ProdutoResponse produto)
+    {
+        if (produtosSelecionados.Contains(produto.Id))
+        {
+            produtosSelecionados.Remove(produto.Id);
+        }
+        else
+        {
+            if (produto.Categoria == "Sanduiche")
+            {
+                var jaTemSanduiche = cardapio
+                    .Where(p => produtosSelecionados.Contains(p.Id))
+                    .Any(p => p.Categoria == "Sanduiche");
+
+                if (jaTemSanduiche)
+                {
+                    erroModal = "O pedido já possui um sanduíche. Remova-o para escolher outro.";
+                    return;
+                }
+            }
+
+            produtosSelecionados.Add(produto.Id);
+        }
+
+        erroModal = null;
+    }
+
+    private async Task SalvarPedido()
+    {
+        if (produtosSelecionados.Count == 0)
+        {
+            erroModal = "Selecione ao menos um produto.";
+            return;
+        }
+
+        salvando = true;
+        erroModal = null;
+
+        if (pedidoEditando is null)
+        {
+            var result = await PedidoService.CreatePedidoAsync(produtosSelecionados);
+            if (result.Success)
+            {
+                mensagemSucesso = $"Pedido #{result.Data} criado com sucesso!";
+                FecharModal();
+                await CarregarDados();
+            }
+            else
+            {
+                erroModal = result.ErrorMessage;
+            }
+        }
+        else
+        {
+            var result = await PedidoService.UpdatePedidoAsync(pedidoEditando.Id, produtosSelecionados);
+            if (result.Success)
+            {
+                mensagemSucesso = $"Pedido #{pedidoEditando.Id} atualizado com sucesso!";
+                FecharModal();
+                await CarregarDados();
+            }
+            else
+            {
+                erroModal = result.ErrorMessage;
+            }
+        }
+
+        salvando = false;
+    }
+
+    private void ConfirmarExclusao(PedidoResponse pedido) => pedidoParaExcluir = pedido;
+
+    private async Task ExcluirPedido()
+    {
+        if (pedidoParaExcluir is null) return;
+
+        var ok = await PedidoService.DeletePedidoAsync(pedidoParaExcluir.Id);
+
+        if (ok)
+        {
+            mensagemSucesso = $"Pedido #{pedidoParaExcluir.Id} removido.";
+            pedidoParaExcluir = null;
+            await CarregarDados();
+        }
+        else
+        {
+            mensagemErro = "Erro ao remover o pedido.";
+            pedidoParaExcluir = null;
+        }
+    }
+
+    private void VerDetalhes(int id) => Nav.NavigateTo($"/pedidos/{id}");
+}

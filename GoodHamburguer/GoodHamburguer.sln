@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoodHamburguer.API", "GoodHamburguer.API\GoodHamburguer.API.csproj", "{5B1E4627-D1CE-4EF5-B9DF-7B47DB1D21DC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GoodHamburguerAPI", "GoodHamburguerAPI", "{9DC0EC6D-EC4D-4EB9-BC4A-37D1D3A786C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoodHamburguer.Blazor", "GoodHamburguer.Blazor\GoodHamburguer.Blazor.csproj", "{DDC02BDB-C31B-4BE8-BDA9-D199ED462156}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GoodHamburguerBlazor", "GoodHamburguerBlazor", "{D7EA4D1A-42A2-44A9-9072-2076DE924FE5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoodHamburguer.Shared", "GoodHamburguer.Shared\GoodHamburguer.Shared.csproj", "{F490235E-269A-45F4-A4D0-1D080D5C0992}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GoodHamburguerShared", "GoodHamburguerShared", "{207CEC80-F3E6-49E5-99DB-E131B9660AD8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoodHamburguer.Tests", "GoodHamburguer.Tests\GoodHamburguer.Tests.csproj", "{70956159-8565-43CA-998B-9ACDD02E50FD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GoodHamburguerTests", "GoodHamburguerTests", "{569DBECF-CEBD-444B-832B-A4B296BCFA56}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5B1E4627-D1CE-4EF5-B9DF-7B47DB1D21DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B1E4627-D1CE-4EF5-B9DF-7B47DB1D21DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B1E4627-D1CE-4EF5-B9DF-7B47DB1D21DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B1E4627-D1CE-4EF5-B9DF-7B47DB1D21DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDC02BDB-C31B-4BE8-BDA9-D199ED462156}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDC02BDB-C31B-4BE8-BDA9-D199ED462156}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDC02BDB-C31B-4BE8-BDA9-D199ED462156}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDC02BDB-C31B-4BE8-BDA9-D199ED462156}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F490235E-269A-45F4-A4D0-1D080D5C0992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F490235E-269A-45F4-A4D0-1D080D5C0992}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F490235E-269A-45F4-A4D0-1D080D5C0992}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F490235E-269A-45F4-A4D0-1D080D5C0992}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70956159-8565-43CA-998B-9ACDD02E50FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70956159-8565-43CA-998B-9ACDD02E50FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70956159-8565-43CA-998B-9ACDD02E50FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70956159-8565-43CA-998B-9ACDD02E50FD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5B1E4627-D1CE-4EF5-B9DF-7B47DB1D21DC} = {9DC0EC6D-EC4D-4EB9-BC4A-37D1D3A786C0}
+		{DDC02BDB-C31B-4BE8-BDA9-D199ED462156} = {D7EA4D1A-42A2-44A9-9072-2076DE924FE5}
+		{F490235E-269A-45F4-A4D0-1D080D5C0992} = {207CEC80-F3E6-49E5-99DB-E131B9660AD8}
+		{70956159-8565-43CA-998B-9ACDD02E50FD} = {569DBECF-CEBD-444B-832B-A4B296BCFA56}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CC02D9E4-C718-4FE0-A6A9-429792805946}
+	EndGlobalSection
+EndGlobal
