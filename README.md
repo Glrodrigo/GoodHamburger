@@ -66,8 +66,8 @@ dotnet --version
 ### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/seu-usuario/good-hamburger.git
-cd good-hamburger
+git clone https://github.com/Glrodrigo/GoodHamburger.git
+cd GoodHamburger
 ```
 
 ### 2. Restaure as dependências
